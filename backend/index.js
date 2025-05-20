@@ -10,7 +10,10 @@ dotenv.config();
 
 const PORT = process.env.PORT;
 app.use(cors());
-app.use('/',router);
+app.get('/test', (req, res) => {
+  res.send('Test route works');
+});
+
 
 const __dirname = path.resolve();
 
