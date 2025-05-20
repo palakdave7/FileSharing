@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { UploadFile } from "./service/api";
+import { UploadFile } from "../service/api.js";
 import "./App.css";
 
 function App() {
