@@ -1,16 +1,30 @@
-import { useState, useRef, useEffect } from 'react';
-import { UploadFile } from '../service/api';
-
-import './App.css';
+import { useEffect, useRef, useState } from "react";
+import { UploadFile } from "./service/api";
+import "./App.css";
 
 function App() {
   const [file, setFile] = useState(null);
-  const[res,setRes]=useState(null);
+  const [res, setRes] = useState(null);
+  const [copied, setCopied] = useState(false);
 
   const uploadRef = useRef();
 
   const handleUpload = () => {
-    uploadRef.current.click(); // just trigger the click
+    uploadRef.current.click();
+  };
+
+  const handleCopy = () => {
+    if (res) {
+      navigator.clipboard.writeText(res);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000); // reset after 2 sec
+    }
+  };
+
+  const handleOpen = () => {
+    if (res) {
+      window.open(res, "_blank");
+    }
   };
 
   useEffect(() => {
@@ -20,22 +34,17 @@ function App() {
         fileData.append("name", file.name);
         fileData.append("file", file);
 
-        try {
-          const response = await UploadFile(fileData);
-          setRes(response.path);
-          console.log("Response from API:", response);
-        } catch (error) {
-          console.error("Error uploading file:", error);
-        }
+        const response = await UploadFile(fileData);
+        setRes(response?.path);
       }
     };
-
     apiCall();
   }, [file]);
 
   return (
-    <div className='container'>
+    <div className="container">
       <h1>File Sharing App</h1>
+
       <div>
         <button onClick={handleUpload}>Upload</button>
         <input
@@ -45,9 +54,39 @@ function App() {
           onChange={(event) => setFile(event.target.files[0])}
         />
       </div>
-      <div>
-        <a href={res}>{res}</a>
-      </div>
+
+      {res && (
+        <div
+          style={{
+            marginTop: "20px",
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            flexWrap: "wrap",
+          }}
+        >
+          <a href={res}>{res}</a>
+
+          <button onClick={handleCopy}>
+            {copied ? (
+              <span
+                style={{
+                  //green checkmark
+                  color: "green",
+                  fontSize: "20px",
+                  fontWeight: "bold",
+                }}
+              >
+                ✔
+              </span>
+            ) : (
+              "Copy"
+            )}
+          </button>
+
+          <button onClick={handleOpen}>Download</button>
+        </div>
+      )}
     </div>
   );
 }
